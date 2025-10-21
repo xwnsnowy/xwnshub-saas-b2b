@@ -1,11 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import React from 'react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
+import { RegisterLink, LoginLink, LogoutLink } from '@kinde-oss/kinde-auth-nextjs/components';
 import Logo from '@/public/logo.png';
+import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs';
+
 const menuItems = [
   { name: 'Features', href: '#link' },
   { name: 'Solution', href: '#link' },
@@ -16,6 +19,8 @@ const menuItems = [
 export const HeroHeader = () => {
   const [menuState, setMenuState] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const { getUser, isLoading } = useKindeBrowserClient();
+  const user = getUser();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -24,6 +29,7 @@ export const HeroHeader = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
   return (
     <header>
       <nav data-state={menuState && 'active'} className="fixed z-20 w-full px-2">
@@ -82,28 +88,58 @@ export const HeroHeader = () => {
                   ))}
                 </ul>
               </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className={cn(isScrolled && 'lg:hidden')}
-                >
-                  <Link href="#">
-                    <span>Login</span>
-                  </Link>
-                </Button>
-                <Button asChild size="sm" className={cn(isScrolled && 'lg:hidden')}>
-                  <Link href="#">
-                    <span>Sign Up</span>
-                  </Link>
-                </Button>
-                <Button asChild size="sm" className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                  <Link href="#">
-                    <span>Get Started</span>
-                  </Link>
-                </Button>
-              </div>
+              {isLoading ? null : (
+                <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                  {user ? (
+                    <>
+                      <Link className={buttonVariants({ size: 'sm' })} href="/workspace">
+                        <span>DashBoard</span>
+                      </Link>
+
+                      <LogoutLink
+                        className={buttonVariants({
+                          variant: 'secondary',
+                          size: 'sm',
+                        })}
+                      >
+                        <span>Logout</span>
+                      </LogoutLink>
+                    </>
+                  ) : (
+                    <>
+                      <LoginLink
+                        className={buttonVariants({
+                          variant: 'outline',
+                          size: 'sm',
+                          className: cn(isScrolled && 'lg:hidden'),
+                        })}
+                      >
+                        Sign in
+                      </LoginLink>
+
+                      <RegisterLink
+                        className={buttonVariants({
+                          variant: 'secondary',
+                          size: 'sm',
+                          className: cn(isScrolled && 'lg:hidden'),
+                        })}
+                      >
+                        Sign Up
+                      </RegisterLink>
+
+                      <div className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                        <RegisterLink
+                          className={buttonVariants({
+                            size: 'sm',
+                          })}
+                        >
+                          <span>Get Started</span>
+                        </RegisterLink>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
