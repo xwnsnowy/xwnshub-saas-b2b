@@ -24,20 +24,42 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
-import { workspaceSchema } from '@/schemas/workspace';
+import { workspaceSchema, WorkspaceSchemaType } from '@/schemas/workspace';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { orpc } from '@/lib/orpc';
+import { toast } from 'sonner';
 
 export function CreateWorkspace() {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const form = useForm<z.infer<typeof workspaceSchema>>({
+  const form = useForm<WorkspaceSchemaType>({
     resolver: zodResolver(workspaceSchema),
     defaultValues: {
       name: '',
     },
   });
 
-  function onSubmit(values: z.infer<typeof workspaceSchema>) {
-    console.log(values);
+  const createWorkspaceMutation = useMutation(
+    orpc.workspace.create.mutationOptions({
+      onSuccess: (newWorkspace) => {
+        toast.success(`Workspace ${newWorkspace.workspaceName} created successfully`);
+
+        queryClient.invalidateQueries({
+          queryKey: orpc.workspace.list.queryKey(),
+        });
+
+        form.reset();
+        setOpen(false);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  function onSubmit(values: WorkspaceSchemaType) {
+    createWorkspaceMutation.mutate(values);
   }
 
   return (
@@ -76,8 +98,8 @@ export function CreateWorkspace() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="mt-6">
-              Create Workspace
+            <Button disabled={createWorkspaceMutation.isPending} type="submit" className="mt-6">
+              {createWorkspaceMutation.isPending ? 'Creating...' : 'Create Workspace'}
             </Button>
           </form>
         </Form>
