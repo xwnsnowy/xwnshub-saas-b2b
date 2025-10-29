@@ -34,7 +34,7 @@ export const listWorkspaces = base
     const { getUserOrganizations } = getKindeServerSession();
 
     const organizations = await getUserOrganizations();
-
+    // console.log(organizations);
     if (!organizations) {
       throw errors.FORBIDDEN();
     }

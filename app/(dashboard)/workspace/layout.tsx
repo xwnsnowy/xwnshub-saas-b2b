@@ -21,7 +21,9 @@ const WorkspaceLayout = async ({ children }: { children: React.ReactNode }) => {
         </div>
 
         <div className="mt-auto">
-          <SidebarUserInfo />
+          <HydrateClient client={queryClient}>
+            <SidebarUserInfo />
+          </HydrateClient>
         </div>
       </div>
       {children}
