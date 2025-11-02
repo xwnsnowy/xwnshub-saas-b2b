@@ -1,24 +1,17 @@
+'use client';
+
+import { orpc } from '@/lib/orpc';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 
-const channelList = [
-  {
-    id: '1',
-    name: 'general',
-  },
-  {
-    id: '2',
-    name: 'random',
-  },
-  {
-    id: '3',
-    name: 'development',
-  },
-];
+export function ChannelsList() {
+  const {
+    data: { channels },
+  } = useSuspenseQuery(orpc.channel.list.queryOptions());
 
-export function ChannelList() {
   return (
     <div className="space-y-1 py-1">
-      {channelList.map((channel) => (
+      {channels.map((channel) => (
         <Link
           key={channel.id}
           href={`/workspace/${channel.id}/channel/${channel.id}`}

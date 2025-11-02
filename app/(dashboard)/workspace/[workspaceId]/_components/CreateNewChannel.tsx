@@ -22,7 +22,7 @@ import { orpc } from '@/lib/orpc';
 import { channelNameSchema, ChannelNameSchemaType, transformChannelName } from '@/schemas/channel';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { isDefinedError } from '@orpc/client';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -30,6 +30,8 @@ import { toast } from 'sonner';
 
 export function CreateNewChannel() {
   const [open, setOpen] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const form = useForm<ChannelNameSchemaType>({
     resolver: zodResolver(channelNameSchema),
@@ -42,6 +44,11 @@ export function CreateNewChannel() {
     orpc.channel.create.mutationOptions({
       onSuccess: (newChannel) => {
         toast.success(`Channel "${newChannel.name}" created successfully`);
+
+        queryClient.invalidateQueries({
+          queryKey: orpc.channel.list.queryKey(),
+        });
+
         setOpen(false);
         form.reset();
       },
