@@ -36,6 +36,7 @@ export function SidebarUserInfo() {
               src={getAvatar(user.picture, user.email || 'anonymous')}
               alt="User Image"
               fill
+              sizes="(max-width: 768px) 48px, 48px"
               className="object-cover"
             />
             <AvatarFallback>
@@ -51,6 +52,7 @@ export function SidebarUserInfo() {
               src={getAvatar(user.picture, user.email || 'anonymous')}
               alt="User Image"
               fill
+              sizes="(max-width: 768px) 32px, 32px"
               className="object-cover"
             />
             <AvatarFallback>

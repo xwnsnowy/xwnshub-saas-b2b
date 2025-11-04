@@ -23,6 +23,7 @@ export function MemberList() {
               src={getAvatar(member.picture, member.email)}
               alt="User Image"
               fill
+              sizes="(max-width: 768px) 32px, 32px"
               className="object-cover rounded-full"
             />
             <AvatarFallback>{member.full_name?.charAt(0)}</AvatarFallback>
