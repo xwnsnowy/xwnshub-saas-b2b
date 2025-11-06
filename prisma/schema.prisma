@@ -18,5 +18,25 @@ model Channel {
   workspaceId String // Kinde organization ID
   createdById String // Kinde user ID
 
+  messages Message[]
+
   @@unique([workspaceId, name])
 }
+
+model Message {
+  id String @id @default(uuid())
+  content String
+  imageUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authorId String
+  authorEmail String
+  authorName String
+  authorAvatar String
+  
+  channelId String
+  channel Channel @relation(fields: [channelId], references: [id])
+}
+
+
