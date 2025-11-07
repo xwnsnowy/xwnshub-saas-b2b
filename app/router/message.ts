@@ -80,9 +80,6 @@ export const listMessages = base
       where: {
         channelId: channelId,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
     });
 
     return data;

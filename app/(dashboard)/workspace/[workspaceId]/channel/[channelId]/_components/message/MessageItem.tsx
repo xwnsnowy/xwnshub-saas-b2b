@@ -1,6 +1,7 @@
 import { Message } from '@/lib/generated/prisma/client';
 import { getAvatar } from '@/lib/get-avatar';
 import Image from 'next/image';
+import { RichTextViewer } from '@/components/rich-text-editor/RichTextViewer';
 
 interface MessageItemProps {
   message: Message;
@@ -33,7 +34,9 @@ export function MessageItem({ message }: MessageItemProps) {
             }).format(message.createdAt)}
           </span>
         </div>
-        <div className="text-sm leading-snug break-words max-w-none">{message.content}</div>
+        <div className="text-sm leading-snug break-words max-w-none">
+          <RichTextViewer content={message.content} />
+        </div>
       </div>
     </div>
   );

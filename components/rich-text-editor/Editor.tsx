@@ -4,7 +4,6 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import { editorExtension } from './extension';
 import { MenuBar } from './MenuBar';
 import { ReactNode } from 'react';
-import { send } from 'process';
 
 interface RichTextEditorProps {
   field: any;
