@@ -24,6 +24,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { isDefinedError } from '@orpc/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -32,6 +33,8 @@ export function CreateNewChannel() {
   const [open, setOpen] = useState(false);
 
   const queryClient = useQueryClient();
+
+  const router = useRouter();
 
   const form = useForm<ChannelNameSchemaType>({
     resolver: zodResolver(channelNameSchema),
@@ -51,6 +54,8 @@ export function CreateNewChannel() {
 
         setOpen(false);
         form.reset();
+
+        router.push(`/workspace/${newChannel.workspaceId}/channel/${newChannel.id}`);
       },
       onError: (error) => {
         if (isDefinedError(error)) {
