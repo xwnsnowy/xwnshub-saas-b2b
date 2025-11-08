@@ -61,13 +61,24 @@ export const listMessages = base
     summary: 'List messages in a channel',
     tags: ['message'],
   })
-  .input(z.string())
-  .output(z.array(z.custom<Message>()))
+  .input(
+    z.object({
+      channelId: z.string(),
+      limit: z.number().min(1).max(100).default(50),
+      cursor: z.string().optional(),
+    }),
+  )
+  .output(
+    z.object({
+      items: z.array(z.custom<Message>()),
+      nextCursor: z.string().optional(),
+      hasMore: z.boolean(),
+    }),
+  )
   .handler(async ({ input, context, errors }) => {
-    const channelId = input;
     const channel = await prisma.channel.findFirst({
       where: {
-        id: channelId,
+        id: input.channelId,
         workspaceId: context.workspace.orgCode,
       },
     });
@@ -76,11 +87,39 @@ export const listMessages = base
       throw errors.FORBIDDEN();
     }
 
-    const data = await prisma.message.findMany({
+    const limit = input.limit;
+
+    const messages = await prisma.message.findMany({
       where: {
-        channelId: channelId,
+        channelId: input.channelId,
       },
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+        {
+          id: 'desc',
+        },
+      ],
+      take: limit + 1,
+      ...(input.cursor && {
+        cursor: { id: input.cursor },
+        skip: 1,
+      }),
     });
 
-    return data;
+    // Check if there are more items
+    const hasMore = messages.length > limit;
+
+    // Remove the extra item if exists
+    const items = hasMore ? messages.slice(0, limit) : messages;
+
+    // Get the last item's ID as next cursor
+    const nextCursor = hasMore && items.length > 0 ? items[items.length - 1].id : undefined;
+
+    return {
+      items,
+      nextCursor,
+      hasMore,
+    };
   });
