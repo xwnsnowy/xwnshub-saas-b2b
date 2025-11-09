@@ -3,21 +3,24 @@ import { MessageItem } from './message/MessageItem';
 import { orpc } from '@/lib/orpc';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export function MessagesList() {
   const { channelId } = useParams<{ channelId: string }>();
 
   const [hasInitialScrolled, setHasInitialScrolled] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef(0);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } =
     useInfiniteQuery({
       ...orpc.message.list.infiniteOptions({
         input: (pageParam: string | undefined) => ({
           channelId: channelId!,
-          limit: 50,
+          limit: 30,
           cursor: pageParam,
         }),
         initialPageParam: undefined,
@@ -38,12 +41,50 @@ export function MessagesList() {
 
   const messages = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data?.pages]);
 
-  // Auto scroll to bottom on initial load
+  // Track scroll position to show/hide scroll button
   useEffect(() => {
-    if (messages.length > 0 && !hasInitialScrolled) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      setShowScrollButton(scrollBottom > 300);
+    };
+
+    // Check initial scroll position
+    handleScroll();
+
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [messages.length]); // Thêm dependency messages.length
+
+  // Auto scroll to bottom on initial load + smooth scroll for new messages
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || messages.length === 0) return;
+
+    // Initial scroll (instant, không smooth)
+    if (!hasInitialScrolled) {
+      container.scrollTop = container.scrollHeight;
       setHasInitialScrolled(true);
+      prevMessagesLengthRef.current = messages.length;
+      return;
     }
+
+    // Smooth scroll cho tin nhắn mới
+    if (messages.length > prevMessagesLengthRef.current) {
+      const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      const isNearBottom = scrollBottom < 150; // User đang ở gần cuối (trong vòng 150px)
+
+      if (isNearBottom) {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
+    }
+
+    prevMessagesLengthRef.current = messages.length;
   }, [messages.length, hasInitialScrolled]);
 
   // Intersection Observer for infinite scroll (load more when scrolling up)
@@ -63,6 +104,16 @@ export function MessagesList() {
 
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const scrollToBottom = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -91,8 +142,19 @@ export function MessagesList() {
         {messages.map((message) => (
           <MessageItem key={message.id} message={message} />
         ))}
-        <div ref={messagesEndRef} />
       </div>
+
+      {showScrollButton && (
+        <Button
+          onClick={scrollToBottom}
+          size="icon"
+          variant="default"
+          className="absolute bottom-4 right-8 z-50 h-10 w-10 rounded-full shadow-lg transition-all hover:shadow-xl"
+          aria-label="Scroll to bottom"
+        >
+          <ArrowDown className="h-5 w-5" />
+        </Button>
+      )}
     </div>
   );
 }
