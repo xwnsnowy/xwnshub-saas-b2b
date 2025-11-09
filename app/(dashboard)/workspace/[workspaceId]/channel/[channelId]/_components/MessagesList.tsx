@@ -16,26 +16,28 @@ export function MessagesList() {
   const prevMessagesLengthRef = useRef(0);
   const prevScrollHeightRef = useRef(0);
 
+  const infiniteQueryOptions = orpc.message.list.infiniteOptions({
+    input: (pageParam: string | undefined) => ({
+      channelId: channelId!,
+      limit: 5,
+      cursor: pageParam,
+    }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage: any) => {
+      return lastPage.hasMore ? lastPage.nextCursor : undefined;
+    },
+    select: (data) => ({
+      pages: [...data.pages].reverse().map((page) => ({
+        ...page,
+        items: page.items.slice().reverse(),
+      })),
+      pageParams: [...data.pageParams].reverse(),
+    }),
+  });
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } =
     useInfiniteQuery({
-      ...orpc.message.list.infiniteOptions({
-        input: (pageParam: string | undefined) => ({
-          channelId: channelId!,
-          limit: 5,
-          cursor: pageParam,
-        }),
-        initialPageParam: undefined,
-        getNextPageParam: (lastPage: any) => {
-          return lastPage.hasMore ? lastPage.nextCursor : undefined;
-        },
-        select: (data) => ({
-          pages: [...data.pages].reverse().map((page) => ({
-            ...page,
-            items: page.items.slice().reverse(),
-          })),
-          pageParams: [...data.pageParams].reverse(),
-        }),
-      }),
+      ...infiniteQueryOptions,
       staleTime: 30_000,
       refetchOnWindowFocus: false,
     });
@@ -64,7 +66,6 @@ export function MessagesList() {
     const container = scrollContainerRef.current;
     if (!container || messages.length === 0) return;
 
-    // Initial scroll (instant, không smooth)
     if (!hasInitialScrolled) {
       container.scrollTop = container.scrollHeight;
       setHasInitialScrolled(true);
@@ -75,18 +76,14 @@ export function MessagesList() {
 
     const messagesAdded = messages.length - prevMessagesLengthRef.current;
 
-    // Nếu có tin nhắn mới (thêm vào cuối danh sách)
     if (messagesAdded > 0) {
-      // Kiểm tra xem tin nhắn mới có phải được thêm vào đầu (load more) hay cuối (tin nhắn mới)
       const isLoadingOlder =
         prevScrollHeightRef.current > 0 && container.scrollHeight > prevScrollHeightRef.current;
 
       if (isLoadingOlder) {
-        // Load tin nhắn cũ: maintain scroll position
         const heightDifference = container.scrollHeight - prevScrollHeightRef.current;
         container.scrollTop = container.scrollTop + heightDifference;
       } else {
-        // Tin nhắn mới: smooth scroll nếu user đang ở gần bottom
         const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
         const isNearBottom = scrollBottom < 150;
 
