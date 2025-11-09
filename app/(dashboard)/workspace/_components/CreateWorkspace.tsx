@@ -43,13 +43,11 @@ export function CreateWorkspace() {
   const createWorkspaceMutation = useMutation(
     orpc.workspace.create.mutationOptions({
       onSuccess: (newWorkspace) => {
-        toast.success(`Workspace ${newWorkspace.workspaceName} created successfully`);
-
         queryClient.invalidateQueries({
           queryKey: orpc.workspace.list.queryKey(),
         });
 
-        form.reset();
+        toast.success(`Workspace ${newWorkspace.workspaceName} created successfully`);
         setOpen(false);
       },
       onError: (error) => {

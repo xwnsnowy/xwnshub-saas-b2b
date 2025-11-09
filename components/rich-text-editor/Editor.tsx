@@ -3,7 +3,7 @@
 import { EditorContent, useEditor } from '@tiptap/react';
 import { editorExtension } from './extension';
 import { MenuBar } from './MenuBar';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 interface RichTextEditorProps {
   field: any;
@@ -39,6 +39,17 @@ export function RichTextEditor({ field, sendButton, footerLeft }: RichTextEditor
       },
     },
   });
+
+  useEffect(() => {
+    if (!editor || !field) return;
+
+    const isEmpty = !field.value || field.value === '';
+    const editorIsEmpty = editor.isEmpty;
+
+    if (isEmpty && !editorIsEmpty) {
+      editor.commands.clearContent();
+    }
+  }, [editor, field?.value]);
 
   return (
     <div className="relative w-full border border-input rounded-lg overflow-hidden dark:bg-input/30 flex flex-col">

@@ -30,7 +30,8 @@ export function MessageInputForm({ channelId }: MessageInputFormProps) {
         queryClient.invalidateQueries({
           queryKey: orpc.message.list.key(),
         });
-        return toast.success('Message sent successfully!');
+        form.reset();
+        toast.success('Message sent successfully!');
       },
       onError: () => {
         return toast.error('Failed to send message.');
