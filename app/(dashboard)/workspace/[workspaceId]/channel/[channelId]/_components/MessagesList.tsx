@@ -54,7 +54,6 @@ export function MessagesList() {
   const lastMessageId = messages[messages.length - 1]?.id;
   const lastMessageAuthorId = messages[messages.length - 1]?.authorId;
 
-  // Helper to check if near bottom
   const checkIfNearBottom = (container: HTMLDivElement, threshold = 150) => {
     const scrollBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
     return scrollBottom < threshold;
@@ -81,7 +80,6 @@ export function MessagesList() {
     const container = scrollContainerRef.current;
     if (!container || messages.length === 0) return;
 
-    // Initial scroll to bottom
     if (!hasInitialScrolled) {
       container.scrollTop = container.scrollHeight;
       setHasInitialScrolled(true);
@@ -101,36 +99,17 @@ export function MessagesList() {
       // Check if it's new messages at the bottom (not loading older messages)
       const isNewMessageAtBottom = currentLastMessageId !== lastMessageIdRef.current;
 
-      console.log('📊 Message Update:', {
-        messagesAdded,
-        isNewMessageAtBottom,
-        currentLastMessageId,
-        lastMessageIdRef: lastMessageIdRef.current,
-        authorId: latestMessage?.authorId,
-        userId: user.id,
-        isMyMessage: latestMessage?.authorId === user.id,
-        isNearBottom: isNearBottomRef.current,
-      });
-
       if (isNewMessageAtBottom) {
         // New messages at bottom
         const isMyMessage = latestMessage?.authorId === user.id;
-
-        console.log('✅ New message detected:', {
-          isMyMessage,
-          willScroll: isMyMessage || isNearBottomRef.current,
-        });
 
         // Always scroll if it's my message, or if user is near bottom
         if (isMyMessage || isNearBottomRef.current) {
           // Use instant scroll for own messages to avoid timing issues
           if (isMyMessage) {
-            console.log('🚀 Instant scroll for my message');
             container.scrollTop = container.scrollHeight;
             isNearBottomRef.current = true;
           } else {
-            console.log('🌊 Smooth scroll for others message');
-            // Smooth scroll for others' messages when near bottom
             container.scrollTo({
               top: container.scrollHeight,
               behavior: 'smooth',
@@ -164,19 +143,10 @@ export function MessagesList() {
 
     // Check if this is a new message (not loading older ones)
     if (lastMessageId !== lastMessageIdRef.current && lastMessageIdRef.current !== null) {
-      console.log('🔔 New message effect triggered:', {
-        lastMessageId,
-        lastMessageAuthorId,
-        userId: user.id,
-        isMyMessage: lastMessageAuthorId === user.id,
-        isNearBottom: isNearBottomRef.current,
-      });
-
       const isMyMessage = lastMessageAuthorId === user.id;
 
       if (isMyMessage || isNearBottomRef.current) {
         if (isMyMessage) {
-          console.log('🚀 [New Effect] Instant scroll for my message');
           requestAnimationFrame(() => {
             container.scrollTop = container.scrollHeight;
             isNearBottomRef.current = true;

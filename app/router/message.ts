@@ -43,7 +43,10 @@ export const createMessageChannel = base
         imageUrl: input.imageUrl,
         authorId: context.user.id,
         authorEmail: context.user.email!,
-        authorName: context.user.given_name ?? 'Tommy',
+        authorName:
+          context.user.given_name && context.user.family_name
+            ? context.user.given_name + ' ' + context.user.family_name
+            : 'Tommy',
         authorAvatar: getAvatar(context.user.picture, context.user.email!),
       },
     });

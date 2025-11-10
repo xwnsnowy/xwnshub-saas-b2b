@@ -1,7 +1,7 @@
 import { detectBot } from '@/lib/arcjet';
 import arcjet, { createMiddleware } from '@arcjet/next';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
-import { NextRequest, NextResponse } from 'next/server';
+import { getKindeServerSession, withAuth } from '@kinde-oss/kinde-auth-nextjs/server';
+import { NextMiddleware, NextRequest, NextResponse } from 'next/server';
 
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
@@ -14,20 +14,52 @@ const aj = arcjet({
 });
 
 async function existingMiddleware(req: NextRequest) {
-  const { getClaim } = getKindeServerSession();
-  const orgCode = await getClaim('org_code');
-
   const url = req.nextUrl;
 
-  if (url.pathname.startsWith('/workspace') && !url.pathname.includes(orgCode?.value || '')) {
-    url.pathname = `/workspace/${orgCode?.value || 'default'}`;
-    return NextResponse.redirect(url);
+  // Skip workspace redirect for non-workspace paths
+  if (!url.pathname.startsWith('/workspace')) {
+    return NextResponse.next();
   }
 
-  return NextResponse.next();
+  try {
+    const { getClaim } = getKindeServerSession();
+    const orgCode = await getClaim('org_code');
+    const orgCodeValue = orgCode?.value;
+
+    // If no org code, redirect to error page
+    if (!orgCodeValue) {
+      url.pathname = '/workspace/error';
+      return NextResponse.redirect(url);
+    }
+
+    // If already on correct workspace path, continue
+    if (url.pathname.includes(orgCodeValue)) {
+      return NextResponse.next();
+    }
+
+    // Redirect to correct workspace
+    const pathSegments = url.pathname.split('/').filter(Boolean);
+    if (pathSegments.length === 1) {
+      // /workspace -> /workspace/{orgCode}
+      url.pathname = `/workspace/${orgCodeValue}`;
+    } else {
+      // /workspace/wrong -> /workspace/{orgCode}
+      pathSegments[1] = orgCodeValue;
+      url.pathname = `/${pathSegments.join('/')}`;
+    }
+
+    return NextResponse.redirect(url);
+  } catch (error) {
+    console.error('Middleware error:', error);
+    return NextResponse.next();
+  }
 }
 
-export default createMiddleware(aj, existingMiddleware);
+const authMiddleware = withAuth(existingMiddleware, {
+  publicPaths: ['/'],
+}) as NextMiddleware;
+
+export default createMiddleware(aj, authMiddleware);
 
 export const config = {
   // matcher tells Next.js which routes to run the middleware on.
