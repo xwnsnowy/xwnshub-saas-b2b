@@ -42,7 +42,10 @@ export function MessageInputForm({ channelId }: MessageInputFormProps) {
   );
 
   function onSubmit(data: CreateMessageChannelType) {
-    createMessageChannelMutation.mutate(data);
+    createMessageChannelMutation.mutate({
+      ...data,
+      imageUrl: upload.stagedUrl ?? undefined,
+    });
   }
 
   return (

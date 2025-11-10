@@ -1,43 +1,96 @@
+'use client';
+
 import { Message } from '@/lib/generated/prisma/client';
 import { getAvatar } from '@/lib/get-avatar';
 import Image from 'next/image';
 import { RichTextViewer } from '@/components/rich-text-editor/RichTextViewer';
+import { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MessageItemProps {
   message: Message;
 }
 
 export function MessageItem({ message }: MessageItemProps) {
-  return (
-    <div className="flex space-x-3 relative p-3 rounded-lg group hover:bg-muted/50">
-      <Image
-        src={getAvatar(message.authorAvatar, message.authorEmail)}
-        alt="User Avatar"
-        width={32}
-        height={32}
-        className="size-8 rounded-lg"
-      />
+  const [isImageOpen, setIsImageOpen] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
-      <div className="flex-1 space-y-1 min-w-0">
-        <div className="flex items-center gap-x-2">
-          <span className="font-medium leading-none">{message.authorName}</span>
-          <span className="text-xs text-muted-foreground leading-none">
-            {new Intl.DateTimeFormat('en-US', {
-              day: 'numeric',
-              month: 'short',
-              hour: 'numeric',
-            }).format(message.createdAt)}{' '}
-            {new Intl.DateTimeFormat('en-US', {
-              hour12: false,
-              hour: '2-digit',
-              minute: '2-digit',
-            }).format(message.createdAt)}
-          </span>
-        </div>
-        <div className="text-sm leading-snug break-words max-w-none">
-          <RichTextViewer content={message.content} />
+  return (
+    <>
+      <div className="flex space-x-3 relative p-3 rounded-lg group hover:bg-muted/50">
+        <Image
+          src={getAvatar(message.authorAvatar, message.authorEmail)}
+          alt="User Avatar"
+          width={32}
+          height={32}
+          className="size-8 rounded-lg"
+        />
+
+        <div className="flex-1 space-y-1 min-w-0">
+          <div className="flex items-center gap-x-2">
+            <span className="font-medium leading-none">{message.authorName}</span>
+            <span className="text-xs text-muted-foreground leading-none">
+              {new Intl.DateTimeFormat('en-US', {
+                day: 'numeric',
+                month: 'short',
+                hour: 'numeric',
+              }).format(message.createdAt)}{' '}
+              {new Intl.DateTimeFormat('en-US', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+              }).format(message.createdAt)}
+            </span>
+          </div>
+          <div className="text-sm leading-snug break-words max-w-none">
+            <RichTextViewer content={message.content} />
+          </div>
+
+          {message.imageUrl && (
+            <div className="mt-2 relative max-w-[320px]">
+              {imageLoading && <Skeleton className="w-full h-[200px] rounded-md absolute" />}
+              <Image
+                src={message.imageUrl}
+                alt="Attached Image"
+                width={320}
+                height={200}
+                sizes="(max-width: 768px) 100vw, 320px"
+                className="rounded-md border border-border w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setIsImageOpen(true)}
+                onLoadingComplete={() => setImageLoading(false)}
+                onError={() => setImageLoading(false)}
+                priority={false}
+              />
+            </div>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Image Preview Dialog */}
+      <Dialog open={isImageOpen} onOpenChange={setIsImageOpen}>
+        <DialogContent className="max-w-7xl w-full p-0 overflow-hidden">
+          <DialogHeader>
+            <DialogTitle></DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
+          <div className="relative w-full h-[90vh]">
+            <Image
+              src={message.imageUrl || ''}
+              alt="Full Size Image"
+              fill
+              className="object-contain"
+              quality={100}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
