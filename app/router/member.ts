@@ -6,8 +6,9 @@ import { base } from '../middlewares/base';
 import { requiredWorkspaceMiddleware } from '../middlewares/workspace';
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import z from 'zod';
-import { init, Users } from '@kinde/management-api-js';
+import { init, organization_user, Organizations, Users } from '@kinde/management-api-js';
 import { getAvatar } from '@/lib/get-avatar';
+import { readSecurityMiddleware } from '../middlewares/arcjet/read';
 
 export const inviteMember = base
   .use(requiredAuthMiddleware)
@@ -43,6 +44,38 @@ export const inviteMember = base
           ],
         },
       });
+    } catch {
+      throw errors.INTERNAL_SERVER_ERROR();
+    }
+  });
+
+export const listMembers = base
+  .use(requiredAuthMiddleware)
+  .use(requiredWorkspaceMiddleware)
+  .use(standardSecurityMiddleware)
+  .use(readSecurityMiddleware)
+  .route({
+    method: 'GET',
+    path: '/member',
+    summary: 'List members',
+    tags: ['member'],
+  })
+  .input(z.void())
+  .output(z.array(z.custom<organization_user>()))
+  .handler(async ({ context, errors }) => {
+    try {
+      init();
+
+      const members = await Organizations.getOrganizationUsers({
+        orgCode: context.workspace!.orgCode,
+        sort: 'id_desc',
+      });
+
+      if (!members.organization_users) {
+        throw errors.NOT_FOUND();
+      }
+
+      return members.organization_users;
     } catch {
       throw errors.INTERNAL_SERVER_ERROR();
     }

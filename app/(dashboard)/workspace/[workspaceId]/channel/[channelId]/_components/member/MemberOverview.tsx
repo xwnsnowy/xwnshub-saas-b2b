@@ -1,11 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { orpc } from '@/lib/orpc';
+import { useQuery } from '@tanstack/react-query';
 import { Search, Users } from 'lucide-react';
 import { useState } from 'react';
+import { MemberItem } from './MemberItem';
 
 export function MemberOverview() {
   const [open, setOpen] = useState(false);
+  const { data, isLoading, error } = useQuery(orpc.workspace.member.list.queryOptions());
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -20,7 +24,7 @@ export function MemberOverview() {
           {/* Header */}
           <div className="p-4 border-b">
             <h3 className="font-semibold text-sm">Workspace Members</h3>
-            <p className="text-xs text-muted-foreground">5 Members</p>
+            <p className="text-xs text-muted-foreground">{data?.length} Members</p>
           </div>
           {/* Search */}
           <div className="p-4 border-b">
@@ -39,31 +43,9 @@ export function MemberOverview() {
 
           {/* Member List */}
           <div className="max-h-80 overflow-y-auto">
-            {/* Example Member Item */}
-            <div className="flex items-center justify-between p-4 hover:bg-accent ">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm font-medium text-white">
-                  AB
-                </div>
-                <div>
-                  <p className="font-medium">Alice Brown</p>
-                  <p className="text-xs text-muted-foreground">@alicebrown</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  type="button"
-                  className="gap-1.5 px-2.5 py-1.5 text-xs"
-                >
-                  Message
-                </Button>
-                <Users className="size-4" />
-              </div>
-            </div>
-
-            {/* Repeat Member Items as needed */}
+            {data?.map((member) => (
+              <MemberItem key={member.id} member={member} />
+            ))}
           </div>
         </div>
       </PopoverContent>
