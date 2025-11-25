@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { MessageHoverToolbar } from '../toolbar';
 
 interface MessageItemProps {
   message: Message;
@@ -23,7 +24,7 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
 
   return (
     <>
-      <div className="flex space-x-3 relative p-3 rounded-lg group hover:bg-muted/50">
+      <div className="flex space-x-3 relative p-3 rounded-lg group hover:bg-muted/50 transition-colors">
         <Image
           src={getAvatar(message.authorAvatar, message.authorEmail)}
           alt="User Avatar"
@@ -67,6 +68,7 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
             </div>
           )}
         </div>
+        <MessageHoverToolbar />
       </div>
 
       {/* Image Preview Dialog */}
