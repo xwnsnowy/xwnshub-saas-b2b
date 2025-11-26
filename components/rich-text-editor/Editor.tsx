@@ -13,7 +13,6 @@ interface RichTextEditorProps {
 
 export function RichTextEditor({ field, sendButton, footerLeft }: RichTextEditorProps) {
   const editor = useEditor({
-    // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
     content: () => {
       if (!field?.value) {
@@ -48,6 +47,14 @@ export function RichTextEditor({ field, sendButton, footerLeft }: RichTextEditor
 
     if (isEmpty && !editorIsEmpty) {
       editor.commands.clearContent();
+    } else if (!isEmpty && editorIsEmpty) {
+      // Set content nếu editor trống nhưng field có giá trị
+      try {
+        const content = JSON.parse(field.value);
+        editor.commands.setContent(content);
+      } catch {
+        // Nếu parse lỗi thì bỏ qua
+      }
     }
   }, [editor, field?.value]);
 

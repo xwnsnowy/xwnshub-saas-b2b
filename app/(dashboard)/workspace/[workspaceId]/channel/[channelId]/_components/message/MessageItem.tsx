@@ -13,6 +13,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { MessageHoverToolbar } from '../toolbar';
+import { InfiniteData, useQueryClient, useMutation } from '@tanstack/react-query';
+import { orpc } from '@/lib/orpc';
+import { toast } from 'sonner';
+import { UpdateMessageType } from '@/schemas/message';
+import { EditMessage } from '../toolbar/EditMessage';
 
 interface MessageItemProps {
   message: Message;
@@ -21,6 +26,43 @@ interface MessageItemProps {
 
 export function MessageItem({ message, onImageLoad }: MessageItemProps) {
   const [isImageOpen, setIsImageOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: updateMessage } = useMutation(
+    orpc.message.update.mutationOptions({
+      onSuccess: (updated) => {
+        type MessagePage = { items: Message[]; nextCursor: string | null };
+        type InfiniteMessages = InfiniteData<MessagePage>;
+
+        queryClient.setQueryData<InfiniteMessages>(
+          ['messages', 'list', message.channelId],
+          (oldData) => {
+            if (!oldData) return oldData;
+
+            const pages = oldData.pages.map((page) => ({
+              ...page,
+              items: page.items.map((msg) =>
+                msg.id === updated.id ? { ...msg, ...updated } : msg,
+              ),
+            }));
+
+            return { ...oldData, pages };
+          },
+        );
+        toast.success('Message updated successfully');
+        setIsEditing(false);
+      },
+      onError: (error) => {
+        toast.error(`Failed to update message: ${error.message}`);
+      },
+    }),
+  );
+
+  const handleSaveEdit = async (data: UpdateMessageType) => {
+    await updateMessage(data);
+  };
 
   return (
     <>
@@ -49,26 +91,36 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
               }).format(message.createdAt)}
             </span>
           </div>
-          <div className="text-sm leading-snug break-words max-w-none">
-            <RichTextViewer content={message.content} />
-          </div>
+          {isEditing ? (
+            <EditMessage
+              message={message}
+              onCancel={() => setIsEditing(false)}
+              onSave={handleSaveEdit}
+            />
+          ) : (
+            <>
+              <div className="text-sm leading-snug break-words max-w-none">
+                <RichTextViewer content={message.content} />
+              </div>
 
-          {message.imageUrl && (
-            <div className="mt-2 relative max-w-[320px] w-full bg-muted rounded-md overflow-hidden">
-              <Image
-                src={message.imageUrl}
-                alt="Attached Image"
-                width={640}
-                height={360}
-                sizes="(max-width: 768px) 100vw, 320px"
-                className="rounded-md border border-border w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                onClick={() => setIsImageOpen(true)}
-                onLoad={onImageLoad}
-              />
-            </div>
+              {message.imageUrl && (
+                <div className="mt-2 relative max-w-[320px] w-full bg-muted rounded-md overflow-hidden">
+                  <Image
+                    src={message.imageUrl}
+                    alt="Attached Image"
+                    width={640}
+                    height={360}
+                    sizes="(max-width: 768px) 100vw, 320px"
+                    className="rounded-md border border-border w-full h-auto object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                    onClick={() => setIsImageOpen(true)}
+                    onLoad={onImageLoad}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
-        <MessageHoverToolbar />
+        <MessageHoverToolbar onEdit={() => setIsEditing(true)} />
       </div>
 
       {/* Image Preview Dialog */}

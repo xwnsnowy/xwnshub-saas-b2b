@@ -139,12 +139,7 @@ export const updateMessage = base
     tags: ['message'],
   })
   .input(updateMessageSchema)
-  .output(
-    z.object({
-      message: z.custom<Message>(),
-      canEdit: z.boolean(),
-    }),
-  )
+  .output(z.custom<Message>())
   .handler(async ({ input, context, errors }) => {
     const message = await prisma.message.findFirst({
       where: {
@@ -176,8 +171,5 @@ export const updateMessage = base
       },
     });
 
-    return {
-      message: updated,
-      canEdit: updated.authorId === context.user.id,
-    };
+    return updated;
   });
