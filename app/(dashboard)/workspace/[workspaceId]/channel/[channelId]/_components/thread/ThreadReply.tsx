@@ -1,12 +1,19 @@
+import { RichTextViewer } from '@/components/rich-text-editor/RichTextViewer';
 import Image from 'next/image';
 
 interface ThreadReplyProps {
   message: {
-    id: number;
-    authorName: string;
-    authorImage: string;
-    content: string;
+    id: string;
     createdAt: Date;
+    updatedAt: Date;
+    channelId: string;
+    content: string;
+    imageUrl: string | null;
+    threadId: string | null;
+    authorId: string;
+    authorEmail: string;
+    authorName: string;
+    authorAvatar: string;
   };
 }
 
@@ -15,7 +22,7 @@ export function ThreadReply({ message }: ThreadReplyProps) {
     <div className="flex space-x-3 p-3 hover:bg-muted/30 rounded-lg">
       <Image
         alt="Author Avatar"
-        src={message.authorImage}
+        src={message.authorAvatar}
         width={32}
         height={32}
         className="size-8 rounded-full shrink-0 mt-1"
@@ -34,7 +41,10 @@ export function ThreadReply({ message }: ThreadReplyProps) {
           </span>
         </div>
 
-        <p className="text-sm break-words prose dark:prose-invert max-w-none">{message.content}</p>
+        <RichTextViewer
+          content={message.content}
+          className="text-sm break-words prose dark:prose-invert max-w-none"
+        />
       </div>
     </div>
   );

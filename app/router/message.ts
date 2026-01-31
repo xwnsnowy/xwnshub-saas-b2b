@@ -195,3 +195,59 @@ export const updateMessage = base
 
     return updated;
   });
+
+export const listThreadReplies = base
+  .use(requiredAuthMiddleware)
+  .use(requiredWorkspaceMiddleware)
+  .use(standardSecurityMiddleware)
+  .route({
+    method: 'GET',
+    path: '/message/:messageId/replies',
+    summary: 'List replies to a message',
+    tags: ['message'],
+  })
+  .input(z.object({ messageId: z.string() }))
+  .output(
+    z.object({
+      parent: z.custom<Message>(),
+      messages: z.array(z.custom<Message>()),
+    }),
+  )
+  .handler(async ({ input, context, errors }) => {
+    const parentRow = await prisma.message.findFirst({
+      where: {
+        id: input.messageId,
+        channel: {
+          workspaceId: context.workspace.orgCode,
+        },
+      },
+    });
+
+    if (!parentRow) {
+      throw errors.NOT_FOUND();
+    }
+
+    const replies = await prisma.message.findMany({
+      where: {
+        threadId: input.messageId,
+      },
+      orderBy: [
+        {
+          createdAt: 'asc',
+        },
+        {
+          id: 'asc',
+        },
+      ],
+    });
+
+    const parent = {
+      ...parentRow,
+    };
+
+    const messages = replies.map((r) => ({
+      ...r,
+    }));
+
+    return { parent, messages };
+  });

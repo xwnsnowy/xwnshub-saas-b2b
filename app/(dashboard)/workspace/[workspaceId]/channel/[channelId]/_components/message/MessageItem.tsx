@@ -120,7 +120,7 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
             </>
           )}
         </div>
-        <MessageHoverToolbar onEdit={() => setIsEditing(true)} />
+        <MessageHoverToolbar onEdit={() => setIsEditing(true)} messageId={message.id} />
       </div>
 
       {/* Image Preview Dialog */}
