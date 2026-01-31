@@ -8,29 +8,53 @@ import { useForm } from 'react-hook-form';
 import { MessageComposer } from '../message/MessageComposer';
 import { useAttachmentUpload } from '@/lib/use-attachment-upload';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { orpc } from '@/lib/orpc';
+import { toast } from 'sonner';
 
-export function ThreadReplyForm() {
+interface ThreadReplyFormProps {
+  threadId: string;
+}
+
+export function ThreadReplyForm({ threadId }: ThreadReplyFormProps) {
   const { channelId } = useParams<{ channelId: string }>();
 
   const upload = useAttachmentUpload();
-
-  const [editorKey, setEditorKey] = useState(0);
 
   const form = useForm({
     resolver: zodResolver(createMessageChannelSchema),
     defaultValues: {
       content: '',
       channelId: channelId,
+      threadId: threadId,
     },
   });
 
+  const createMessageMutation = useMutation(
+    orpc.message.create.mutationOptions({
+      onSuccess: () => {
+        form.reset({ channelId, content: '', threadId: '' });
+        upload.reset();
+
+        toast.success('Message sent successfully!');
+      },
+
+      onError: () => {
+        return toast.error('Something went wrong.');
+      },
+    }),
+  );
+
   function onSubmit(data: CreateMessageChannelType) {
-    console.log(data);
+    createMessageMutation.mutate({
+      ...data,
+      imageUrl: upload.stagedUrl ?? undefined,
+    });
   }
 
   return (
     <Form {...form}>
-      <form>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="content"
@@ -41,7 +65,6 @@ export function ThreadReplyForm() {
                   value={field.value}
                   onChange={field.onChange}
                   upload={upload}
-                  key={editorKey}
                   onSubmit={() => onSubmit(form.getValues())}
                 />
               </FormControl>

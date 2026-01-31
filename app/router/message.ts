@@ -36,6 +36,26 @@ export const createMessageChannel = base
       throw errors.FORBIDDEN();
     }
 
+    // if this is a thread reply, validate the parent message
+    if (input.threadId) {
+      const parentMessage = await prisma.message.findFirst({
+        where: {
+          id: input.threadId,
+          channel: {
+            workspaceId: context.workspace.orgCode,
+          },
+        },
+      });
+
+      if (
+        !parentMessage ||
+        parentMessage.channelId !== input.channelId ||
+        parentMessage.threadId !== null
+      ) {
+        throw errors.BAD_REQUEST();
+      }
+    }
+
     const created = await prisma.message.create({
       data: {
         channelId: input.channelId,
@@ -48,6 +68,7 @@ export const createMessageChannel = base
             ? context.user.given_name + ' ' + context.user.family_name
             : 'Tommy',
         authorAvatar: getAvatar(context.user.picture, context.user.email!),
+        threadId: input.threadId,
       },
     });
 
@@ -95,6 +116,7 @@ export const listMessages = base
     const messages = await prisma.message.findMany({
       where: {
         channelId: input.channelId,
+        threadId: null,
       },
       orderBy: [
         {
