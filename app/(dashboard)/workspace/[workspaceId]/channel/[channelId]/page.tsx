@@ -59,7 +59,9 @@ const ChannelPageMain = () => {
         </div>
       </div>
 
-      {isThreadOpen && <ThreadSidebar />}
+      {isThreadOpen && (
+        <ThreadSidebar user={data?.currentUser as KindeUser<Record<string, unknown>>} />
+      )}
     </div>
   );
 };
