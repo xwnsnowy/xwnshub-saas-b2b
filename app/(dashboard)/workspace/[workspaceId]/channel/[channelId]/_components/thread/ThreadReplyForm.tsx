@@ -8,12 +8,13 @@ import { useForm } from 'react-hook-form';
 import { MessageComposer } from '../message/MessageComposer';
 import { useAttachmentUpload } from '@/lib/use-attachment-upload';
 import { useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orpc } from '@/lib/orpc';
 import { toast } from 'sonner';
 import { Message } from '@/lib/generated/prisma/client';
 import { KindeUser } from '@kinde-oss/kinde-auth-nextjs';
 import { getAvatar } from '@/lib/get-avatar';
+import { MessageListItem } from '@/lib/types';
 
 interface ThreadReplyFormProps {
   threadId: string;
@@ -50,6 +51,13 @@ export function ThreadReplyForm({ threadId, user }: ThreadReplyFormProps) {
           },
         });
 
+        type MessagePage = {
+          items: Array<MessageListItem>;
+          nextCursor: string | null;
+        };
+
+        type InfinitieMessages = InfiniteData<MessagePage>;
+
         await queryClient.cancelQueries({
           queryKey: listOptions.queryKey,
         });
@@ -77,6 +85,32 @@ export function ThreadReplyForm({ threadId, user }: ThreadReplyFormProps) {
             messages: [...old.messages, optimistic],
           };
         });
+
+        // optimistic buump repliesCount in main message list for the parent message
+        queryClient.setQueryData<InfinitieMessages>(
+          ['messages', 'list', channelId],
+          (oldData: any) => {
+            if (!oldData) return oldData;
+
+            const pages = oldData.pages.map((page: { items: any[] }) => ({
+              ...page,
+              items: page.items.map((msg) => {
+                if (msg.id === threadId) {
+                  return {
+                    ...msg,
+                    repliesCount: (msg.repliesCount || 0) + 1,
+                  };
+                }
+                return msg;
+              }),
+            }));
+
+            return {
+              ...oldData,
+              pages,
+            };
+          },
+        );
 
         return {
           listOptions,
