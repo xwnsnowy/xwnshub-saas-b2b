@@ -133,7 +133,11 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
                 </div>
               )}
 
-              <ReactionsBar messageId={message.id} reactions={message.reactions} />
+              <ReactionsBar
+                messageId={message.id}
+                reactions={message.reactions}
+                context={{ type: 'list', channelId: message.channelId }}
+              />
 
               {message.repliesCount > 0 && (
                 <button
