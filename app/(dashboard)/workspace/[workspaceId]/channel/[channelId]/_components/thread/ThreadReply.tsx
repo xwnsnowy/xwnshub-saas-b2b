@@ -9,25 +9,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ReactionsBar } from '../reaction/ReactionsBar';
+import { MessageListItem } from '@/lib/types';
 
 interface ThreadReplyProps {
-  message: {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    channelId: string;
-    content: string;
-    imageUrl: string | null;
-    threadId: string | null;
-    authorId: string;
-    authorEmail: string;
-    authorName: string;
-    authorAvatar: string;
-  };
+  message: MessageListItem;
   onImageLoad?: () => void;
+  selectedThreadId: string;
 }
 
-export function ThreadReply({ message, onImageLoad }: ThreadReplyProps) {
+export function ThreadReply({ message, onImageLoad, selectedThreadId }: ThreadReplyProps) {
   const [isImageOpen, setIsImageOpen] = useState(false);
 
   return (
@@ -74,6 +65,12 @@ export function ThreadReply({ message, onImageLoad }: ThreadReplyProps) {
               />
             </div>
           )}
+
+          <ReactionsBar
+            context={{ type: 'thread', threadId: selectedThreadId }}
+            reactions={message.reactions}
+            messageId={message.id}
+          />
         </div>
       </div>
 

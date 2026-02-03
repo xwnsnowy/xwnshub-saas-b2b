@@ -265,8 +265,8 @@ export const listThreadReplies = base
   .input(z.object({ messageId: z.string() }))
   .output(
     z.object({
-      parent: z.custom<Message>(),
-      messages: z.array(z.custom<Message>()),
+      parent: z.custom<MessageListItem>(),
+      messages: z.array(z.custom<MessageListItem>()),
     }),
   )
   .handler(async ({ input, context, errors }) => {
@@ -275,6 +275,19 @@ export const listThreadReplies = base
         id: input.messageId,
         channel: {
           workspaceId: context.workspace.orgCode,
+        },
+      },
+      include: {
+        _count: {
+          select: {
+            replies: true,
+          },
+        },
+        messsageReactions: {
+          select: {
+            emoji: true,
+            userId: true,
+          },
         },
       },
     });
@@ -295,14 +308,47 @@ export const listThreadReplies = base
           id: 'asc',
         },
       ],
+      include: {
+        _count: {
+          select: {
+            replies: true,
+          },
+        },
+        messsageReactions: {
+          select: {
+            emoji: true,
+            userId: true,
+          },
+        },
+      },
     });
 
-    const parent = {
-      ...parentRow,
+    const parent: MessageListItem = {
+      id: parentRow.id,
+      content: parentRow.content,
+      imageUrl: parentRow.imageUrl,
+      authorAvatar: parentRow.authorAvatar,
+      authorEmail: parentRow.authorEmail,
+      authorId: parentRow.authorId,
+      authorName: parentRow.authorName,
+      createdAt: parentRow.createdAt,
+      updatedAt: parentRow.updatedAt,
+      channelId: parentRow.channelId,
+      threadId: parentRow.threadId,
+      repliesCount: parentRow._count.replies,
+      reactions: groupReactions(
+        parentRow.messsageReactions.map((r) => ({ emoji: r.emoji, userId: r.userId })),
+        context.user.id,
+      ),
     };
 
-    const messages = replies.map((r) => ({
-      ...r,
+    const messages: MessageListItem[] = replies.map((m) => ({
+      ...m,
+      repliesCount: m._count.replies,
+      reactions: groupReactions(
+        m.messsageReactions.map((r) => ({ emoji: r.emoji, userId: r.userId })),
+        context.user.id,
+      ),
     }));
 
     return { parent, messages };

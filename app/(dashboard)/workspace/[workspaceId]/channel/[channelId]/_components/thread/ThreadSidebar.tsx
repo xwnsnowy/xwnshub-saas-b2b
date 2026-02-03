@@ -23,12 +23,13 @@ export function ThreadSidebar({ user }: ThreadSidebarProps) {
   const hasInitialScrolledRef = useRef(false);
   const pendingScrollRef = useRef(false);
 
-  const { data, isLoading } = useQuery(
-    orpc.message.thread.list.queryOptions({
+  const { data, isLoading } = useQuery({
+    ...orpc.message.thread.list.queryOptions({
       input: { messageId: selectedThreadId! },
-      enabled: Boolean(selectedThreadId),
     }),
-  );
+    queryKey: ['messages', 'thread', selectedThreadId],
+    enabled: Boolean(selectedThreadId),
+  });
 
   const messages = useMemo(() => data?.messages ?? [], [data?.messages]);
 
@@ -213,6 +214,7 @@ export function ThreadSidebar({ user }: ThreadSidebarProps) {
                         });
                       }
                     }}
+                    selectedThreadId={selectedThreadId!}
                   />
                 ))}
               </div>
