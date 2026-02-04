@@ -107,8 +107,6 @@ export const generateThreadSummary = base
 Your job is to read a thread (root message + replies) and retell it in a natural, human-like way.
 Guidelines:
 - Keep the summary engaging, like you're narrating what happened in a chat.
-- Mention who said what, and capture the tone of the conversation.
-- Preserve important details (author names, timestamps, main points).
 - Avoid inventing information not present in the thread.
 - Write in plain text, no code formatting.
 - The style should feel like storytelling or a friend recounting the discussion.
