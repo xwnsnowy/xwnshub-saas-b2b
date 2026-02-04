@@ -1,15 +1,22 @@
-import arcjet, { slidingWindow } from '@/lib/arcjet';
+import arcjet, { sensitiveInfo, slidingWindow } from '@/lib/arcjet';
 import { base } from '../base';
 import { KindeUser } from '@kinde-oss/kinde-auth-nextjs';
 
 const buildStandardArcjet = () =>
-  arcjet.withRule(
-    slidingWindow({
-      mode: 'LIVE',
-      interval: '1m',
-      max: 40,
-    }),
-  );
+  arcjet
+    .withRule(
+      slidingWindow({
+        mode: 'LIVE',
+        interval: '1m',
+        max: 40,
+      }),
+    )
+    .withRule(
+      sensitiveInfo({
+        mode: 'LIVE',
+        deny: ['CREDIT_CARD_NUMBER', 'PHONE_NUMBER', 'EMAIL'],
+      }),
+    );
 
 export const writeSecurityMiddleware = base
   .$context<{
@@ -22,6 +29,11 @@ export const writeSecurityMiddleware = base
     });
 
     if (decidedArcjet.isDenied()) {
+      if (decidedArcjet.reason.isSensitiveInfo()) {
+        throw errors.RATE_LIMITED({
+          message: 'Request contains sensitive information and cannot be processed.',
+        });
+      }
       if (decidedArcjet.reason.isRateLimit()) {
         throw errors.RATE_LIMITED({
           message: 'Too many requests. Please try again later.',
