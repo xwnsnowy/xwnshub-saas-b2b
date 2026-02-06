@@ -2,7 +2,7 @@ import { RichTextEditor } from '@/components/rich-text-editor/Editor';
 import ImageUploadModal from '@/components/rich-text-editor/ImageUploadModal';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
-import { UseAttachmentUploadType, useAttachmentUpload } from '@/lib/use-attachment-upload';
+import { UseAttachmentUploadType, useAttachmentUpload } from '@/hooks/use-attachment-upload';
 import { AttachmentPreview } from './AttachmentPreview';
 import { AttachButton } from './AttachButton';
 

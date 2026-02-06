@@ -8,7 +8,7 @@ import { MessageComposer } from './MessageComposer';
 import { orpc } from '@/lib/orpc';
 import { toast } from 'sonner';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAttachmentUpload } from '@/lib/use-attachment-upload';
+import { useAttachmentUpload } from '@/hooks/use-attachment-upload';
 import { Message } from '@/lib/generated/prisma/client';
 import { KindeUser } from '@kinde-oss/kinde-auth-nextjs';
 import { getAvatar } from '@/lib/get-avatar';

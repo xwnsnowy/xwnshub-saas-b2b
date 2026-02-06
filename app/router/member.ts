@@ -4,7 +4,6 @@ import { standardSecurityMiddleware } from '../middlewares/arcjet/standard';
 import { requiredAuthMiddleware } from '../middlewares/auth';
 import { base } from '../middlewares/base';
 import { requiredWorkspaceMiddleware } from '../middlewares/workspace';
-import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server';
 import z from 'zod';
 import { init, organization_user, Organizations, Users } from '@kinde/management-api-js';
 import { getAvatar } from '@/lib/get-avatar';
@@ -44,7 +43,8 @@ export const inviteMember = base
           ],
         },
       });
-    } catch {
+    } catch (error) {
+      console.error('Invite member error:', error);
       throw errors.INTERNAL_SERVER_ERROR();
     }
   });
@@ -76,7 +76,8 @@ export const listMembers = base
       }
 
       return members.organization_users;
-    } catch {
+    } catch (error) {
+      console.error('List members error:', error);
       throw errors.INTERNAL_SERVER_ERROR();
     }
   });

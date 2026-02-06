@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { MessageComposer } from '../message/MessageComposer';
-import { useAttachmentUpload } from '@/lib/use-attachment-upload';
+import { useAttachmentUpload } from '@/hooks/use-attachment-upload';
 import { useEffect } from 'react';
 import { InfiniteData, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orpc } from '@/lib/orpc';
