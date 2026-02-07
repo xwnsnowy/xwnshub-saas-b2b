@@ -3,12 +3,12 @@
 // export dynamically through wrangler, or we can potentially let users directly
 // add them as a sort of "plugin" system.
 
-import ENTRY, { __INTERNAL_WRANGLER_MIDDLEWARE__ } from "D:\\WorkSpace\\b2b-ai-saas\\teamflow-ai\\.wrangler\\tmp\\bundle-6RyncC\\middleware-insertion-facade.js";
-import { __facade_invoke__, __facade_register__, Dispatcher } from "C:\\Users\\user\\AppData\\Local\\pnpm-cache\\dlx\\b9e695ba2d2dc904251c8241b58aca395678c13c8a527d83783e59324265e1db\\19c2e464114-623c\\node_modules\\.pnpm\\wrangler@4.63.0\\node_modules\\wrangler\\templates\\middleware\\common.ts";
-import type { WorkerEntrypointConstructor } from "D:\\WorkSpace\\b2b-ai-saas\\teamflow-ai\\.wrangler\\tmp\\bundle-6RyncC\\middleware-insertion-facade.js";
+import ENTRY, { __INTERNAL_WRANGLER_MIDDLEWARE__ } from "D:\\WorkSpace\\b2b-ai-saas\\teamflow-ai\\.wrangler\\tmp\\bundle-4nW6iu\\middleware-insertion-facade.js";
+import { __facade_invoke__, __facade_register__, Dispatcher } from "C:\\Users\\user\\AppData\\Local\\pnpm-cache\\dlx\\b9e695ba2d2dc904251c8241b58aca395678c13c8a527d83783e59324265e1db\\19c36d81479-6518\\node_modules\\.pnpm\\wrangler@4.63.0\\node_modules\\wrangler\\templates\\middleware\\common.ts";
+import type { WorkerEntrypointConstructor } from "D:\\WorkSpace\\b2b-ai-saas\\teamflow-ai\\.wrangler\\tmp\\bundle-4nW6iu\\middleware-insertion-facade.js";
 
 // Preserve all the exports from the worker
-export * from "D:\\WorkSpace\\b2b-ai-saas\\teamflow-ai\\.wrangler\\tmp\\bundle-6RyncC\\middleware-insertion-facade.js";
+export * from "D:\\WorkSpace\\b2b-ai-saas\\teamflow-ai\\.wrangler\\tmp\\bundle-4nW6iu\\middleware-insertion-facade.js";
 
 class __Facade_ScheduledController__ implements ScheduledController {
 	readonly #noRetry: ScheduledController["noRetry"];

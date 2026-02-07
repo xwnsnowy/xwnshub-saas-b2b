@@ -7,7 +7,12 @@ const roleBadgeClasses: Record<string, string> = {
     'bg-gray-100 text-gray-600 ring-gray-500/10 dark:bg-gray-700/40 dark:text-gray-300 dark:ring-gray-600/30',
 };
 
-export function RoleBadge({ role }: { role: string }) {
+interface RoleBadgeProps {
+  role: string;
+  isAdmin?: boolean;
+}
+
+export function RoleBadge({ role, isAdmin }: RoleBadgeProps) {
   const base =
     'inline-flex h-5 items-center px-2 rounded-md text-xs font-medium ring-1 ring-inset leading-none select-none tracking-wide';
 
@@ -20,7 +25,7 @@ export function RoleBadge({ role }: { role: string }) {
       title={role.charAt(0).toUpperCase() + role.slice(1)}
       role="note"
     >
-      {role === 'admin' ? 'Admin' : role === 'owner' ? 'Owner' : 'Member'}
+      {isAdmin ? 'Admin' : role === 'owner' ? 'Owner' : 'Member'}
     </span>
   );
 }

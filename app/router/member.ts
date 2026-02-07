@@ -43,9 +43,18 @@ export const inviteMember = base
           ],
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Invite member error:', error);
-      throw errors.INTERNAL_SERVER_ERROR();
+
+      // Lấy message chi tiết từ Kinde error body
+      const kindeMessage = error?.body?.errors?.[0]?.message;
+      const kindeCode = error?.body?.errors?.[0]?.code;
+
+      if (kindeCode === 'USER_ALREADY_EXISTS') {
+        throw errors.CONFLICT({ message: 'User with this email already exists in the system.' });
+      }
+
+      throw errors.BAD_REQUEST({ message: kindeMessage || 'Failed to invite member.' });
     }
   });
 

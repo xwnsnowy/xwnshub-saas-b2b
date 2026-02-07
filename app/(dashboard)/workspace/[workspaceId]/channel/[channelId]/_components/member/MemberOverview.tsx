@@ -4,15 +4,33 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { orpc } from '@/lib/orpc';
 import { useQuery } from '@tanstack/react-query';
 import { Search, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MemberItem } from './MemberItem';
 import { Skeleton } from '@/components/ui/skeleton';
+import { usePresence } from '@/hooks/use-presence';
+import { useParams } from 'next/navigation';
+import { User } from '@/schemas/realtime';
 
 export function MemberOverview() {
+  const params = useParams();
+
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
 
   const { data, isLoading, error } = useQuery(orpc.workspace.member.list.queryOptions());
+
+  const { data: workspaces } = useQuery(orpc.workspace.list.queryOptions());
+
+  const currentUser = useMemo(() => {
+    if (!workspaces?.user) return null;
+
+    return {
+      id: workspaces.user.id,
+      full_name: workspaces.user.given_name + ' ' + workspaces.user.family_name,
+      email: workspaces.user.email,
+      picture: workspaces.user.picture,
+    } satisfies User;
+  }, [workspaces?.user]);
 
   const members = data ?? [];
 
@@ -27,6 +45,15 @@ export function MemberOverview() {
       })
     : members;
 
+  const workspaceId = params.workspaceId as string;
+
+  const { onlineUsers } = usePresence({
+    room: `workspace-${workspaceId}`,
+    currentUser: currentUser,
+  });
+
+  const onlineUserIds = useMemo(() => new Set(onlineUsers.map((user) => user.id)), [onlineUsers]);
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -35,7 +62,7 @@ export function MemberOverview() {
           <span>Members</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[300px] p-0">
+      <PopoverContent align="end" className="w-[320px] p-0">
         <div className="p-0">
           {/* Header */}
           <div className="p-4 border-b">
@@ -82,7 +109,13 @@ export function MemberOverview() {
             ) : filteredMembers.length === 0 ? (
               <p className="p-4 text-sm text-muted-foreground">No members found.</p>
             ) : (
-              filteredMembers.map((member) => <MemberItem key={member.id} member={member} />)
+              filteredMembers.map((member) => (
+                <MemberItem
+                  key={member.id}
+                  member={member}
+                  isOnline={member.id ? onlineUserIds.has(member.id) : false}
+                />
+              ))
             )}
           </div>
         </div>
