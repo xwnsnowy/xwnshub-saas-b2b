@@ -1,13 +1,6 @@
 import { RichTextEditor } from '@/components/rich-text-editor/Editor';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Message } from '@/lib/generated/prisma/client';
 import { updateMessageSchema, UpdateMessageType } from '@/schemas/message';
 import { zodResolver } from '@hookform/resolvers/zod';

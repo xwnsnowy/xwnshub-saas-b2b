@@ -22,6 +22,7 @@ import { MessageListItem } from '@/lib/types';
 import { MessagesSquare } from 'lucide-react';
 import { useThread } from '@/providers/ThreadProvider';
 import { ReactionsBar } from '../reaction/ReactionsBar';
+import { useChannelRealtime } from '@/providers/ChannelRealtimeProvider';
 
 interface MessageItemProps {
   message: MessageListItem;
@@ -34,6 +35,8 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
   const { tooggleThread } = useThread();
 
   const queryClient = useQueryClient();
+
+  const { send } = useChannelRealtime();
 
   const { mutateAsync: updateMessage } = useMutation(
     orpc.message.update.mutationOptions({
@@ -56,8 +59,17 @@ export function MessageItem({ message, onImageLoad }: MessageItemProps) {
             return { ...oldData, pages };
           },
         );
+
         toast.success('Message updated successfully');
+
         setIsEditing(false);
+
+        send({
+          type: 'message:updated',
+          payload: {
+            message: updated,
+          },
+        });
       },
       onError: (error) => {
         toast.error(`Failed to update message: ${error.message}`);
