@@ -44,7 +44,6 @@ export const RealtimeMessageSchema = z.object({
   authorAvatar: z.string().optional().nullable(),
   channelId: z.string().nullable(),
   threadId: z.string().optional().nullable(),
-
   reactions: z.array(GroupedReactionsSchema).optional(),
   replyCount: z.number().optional(),
 });
@@ -82,3 +81,24 @@ export const ChannelEventSchema = z.union([
 ]);
 
 export type ChannelEvent = z.infer<typeof ChannelEventSchema>;
+
+// Thread level events
+
+export const ThreadEventSchema = z.union([
+  z.object({
+    type: z.literal('thread:reply:created'),
+    payload: z.object({
+      reply: RealtimeMessageSchema,
+    }),
+  }),
+  z.object({
+    type: z.literal('thread:reaction:updated'),
+    payload: z.object({
+      messageId: z.string(),
+      reactions: z.array(GroupedReactionsSchema),
+      threadId: z.string(),
+    }),
+  }),
+]);
+
+export type ThreadEvent = z.infer<typeof ThreadEventSchema>;
