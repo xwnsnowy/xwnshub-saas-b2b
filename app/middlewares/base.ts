@@ -1,6 +1,7 @@
+import { ArcjetNextRequest } from '@arcjet/next';
 import { os } from '@orpc/server';
 
-export const base = os.$context<{ request: Request }>().errors({
+export const base = os.$context<{ request: Request | ArcjetNextRequest }>().errors({
   RATE_LIMITED: {
     message: 'Too many requests',
   },
