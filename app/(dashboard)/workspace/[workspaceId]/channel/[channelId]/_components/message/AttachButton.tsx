@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ImageIcon, X } from 'lucide-react';
+import { ImageIcon } from 'lucide-react';
 
 export function AttachButton({ onClick }: { onClick: () => void }) {
   return (

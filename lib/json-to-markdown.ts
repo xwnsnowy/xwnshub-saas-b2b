@@ -13,7 +13,7 @@ export async function tiptapJsonToMarkdown(json: string) {
 
   try {
     content = JSON.parse(json);
-  } catch (e) {
+  } catch {
     throw new Error('Invalid JSON format');
   }
 

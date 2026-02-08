@@ -3,9 +3,8 @@ import { redirect } from 'next/navigation';
 import React from 'react';
 
 // import { IconFolderCode } from '@tabler/icons-react';
-import { ArrowUpRightIcon, Cloud } from 'lucide-react';
+import { Cloud } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import {
   Empty,
   EmptyContent,

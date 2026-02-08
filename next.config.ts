@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
         hostname: '*.ingest.uploadthing.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'html.tailus.io',
+        pathname: '/**',
+      },
     ],
   },
 };

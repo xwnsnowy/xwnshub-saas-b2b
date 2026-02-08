@@ -56,7 +56,7 @@ export function RichTextEditor({ field, sendButton, footerLeft }: RichTextEditor
         // Nếu parse lỗi thì bỏ qua
       }
     }
-  }, [editor, field?.value]);
+  }, [editor, field]);
 
   return (
     <div className="relative w-full border border-input rounded-lg overflow-hidden dark:bg-input/30 flex flex-col">

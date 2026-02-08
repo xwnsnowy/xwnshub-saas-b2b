@@ -81,7 +81,7 @@ export const createWorkspace = base
           name: input.name,
         },
       });
-    } catch (error) {
+    } catch {
       throw errors.INTERNAL_SERVER_ERROR();
     }
 

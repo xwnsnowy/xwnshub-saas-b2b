@@ -87,7 +87,7 @@ export class Chat extends Server {
         this.broadcast(payload, [connection.id]);
         return;
       }
-    } catch (e) {
+    } catch {
       console.error('Failed to parse message:', message);
       return;
     }

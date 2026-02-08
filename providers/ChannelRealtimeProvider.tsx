@@ -22,7 +22,7 @@ export function ChannelRealtimeProvider({ channelId, children }: ChannelRealtime
   const queryClient = useQueryClient();
 
   const socket = usePartySocket({
-    host: 'http://127.0.0.1:8787',
+    host: 'https://teamflow-chat-realtime-xwnsnowy.tienthanhcute2k2.workers.dev',
     room: `channel-${channelId}`,
     party: 'chat',
     onMessage: (messageEvent) => {
