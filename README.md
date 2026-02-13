@@ -1,27 +1,28 @@
----
-
 ## ⚡ Key Highlights
-- **Real-time Engine:** Powered by **Cloudflare Durable Objects** (Partyserver) for sub-100ms latency.
-- **AI-First UX:** Integrated **OpenRouter & Vercel AI SDK** for smart message composing and thread summarization.
-- **Enterprise Auth:** Multi-tenant architecture using **Kinde Organizations**.
-- **Security:** Layered protection with **Arcjet WAF**, Bot detection, and PII scanning.
+
+* **Real-time Engine:** Powered by **Cloudflare Durable Objects** (Partyserver) for sub-100ms latency.
+* **AI-First UX:** Integrated **OpenRouter & Vercel AI SDK** for smart message composing and thread summarization.
+* **Enterprise Auth:** Multi-tenant architecture using **Kinde Organizations**.
+* **Security:** Layered protection with **Arcjet WAF**, Bot detection, and PII scanning.
+
+---
 
 ## 🏗 Architecture & Tech Stack
 
 ### Core Framework
-- **Next.js 16 (App Router)** & **React 19** (Server Components, Actions).
-- **TypeScript** for end-to-end type safety.
-- **oRPC & Zod:** Type-safe API layer for seamless Client-Server communication.
+* **Next.js 15 (App Router)** & **React 19** (Server Components, Actions).
+* **TypeScript** for end-to-end type safety.
+* **oRPC & Zod:** Type-safe API layer for seamless Client-Server communication.
 
 ### Data & Real-time
-- **Database:** PostgreSQL via **Prisma ORM**.
-- **Real-time & Presence:** **Partyserver** + Cloudflare Durable Objects for scalable WebSockets.
-- **State Management:** **TanStack Query v5** for optimistic UI updates and cache synchronization.
+* **Database:** PostgreSQL via **Prisma ORM**.
+* **Real-time & Presence:** **Partyserver** + Cloudflare Durable Objects for scalable WebSockets.
+* **State Management:** **TanStack Query v5** for optimistic UI updates and cache synchronization.
 
 ### UI & UX
-- **Editor:** **TipTap** Rich Text Editor with custom extensions and HTML sanitization.
-- **Styling:** **Tailwind CSS v4** & **Radix UI** primitives.
-- **Media:** High-speed image uploads via **Uploadthing**.
+* **Editor:** **TipTap** Rich Text Editor with custom extensions and HTML sanitization.
+* **Styling:** **Tailwind CSS v4** & **Radix UI** primitives.
+* **Media:** High-speed image uploads via **Uploadthing**.
 
 ---
 
@@ -40,3 +41,8 @@
 * **Solution:** Utilized **Vercel AI SDK's `streamText`** combined with OpenRouter. The summary is streamed directly to the Sidebar, allowing users to continue chatting while the AI works.
 
 ---
+
+## 🛡 Security & Resilience
+* **Arcjet Integration:** Implemented specialized rules for rate limiting (shielding expensive AI routes) and bot protection.
+* **Data Integrity:** Zod schemas shared between client and server to prevent malformed data injection.
+* **XSS Protection:** Strict HTML sanitization on all Rich Text content before rendering.
