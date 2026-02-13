@@ -14,7 +14,7 @@ const menuItems = [
   { name: 'Features', href: '#link' },
   { name: 'Solution', href: '#link' },
   { name: 'Pricing', href: '#link' },
-  { name: 'About', href: '#link' },
+  { name: 'About', href: '#about' },
 ];
 
 export const HeroHeader = () => {
@@ -79,12 +79,12 @@ export const HeroHeader = () => {
               <ul className="hidden lg:flex items-center gap-1">
                 {menuItems.map((item, index) => (
                   <li key={index}>
-                    <Link
+                    <a
                       href={item.href}
                       className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:text-primary hover:bg-primary/5"
                     >
                       {item.name}
-                    </Link>
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -172,14 +172,14 @@ export const HeroHeader = () => {
           <ul className="space-y-4">
             {menuItems.map((item, index) => (
               <li key={index}>
-                <Link
+                <a
                   href={item.href}
                   onClick={() => setMenuState(false)}
                   className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:text-primary"
                 >
                   <Cpu className="size-4 text-primary" />
                   {item.name}
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
