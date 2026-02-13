@@ -14,8 +14,14 @@ const menuItems = [
   { name: 'About', href: '#about' },
   { name: 'Solution', href: '#solution' },
   { name: 'Pricing', href: '#pricing' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Contact', href: 'https://www.linkedin.com/in/xwnsnowy-dev' },
 ];
+
+const registerAuthUrlParams = {
+  is_create_org: 'true',
+  org_name: 'My Workspace',
+  pricing_table_key: 'teamflow_plans',
+};
 
 export const HeroHeader = () => {
   const [menuState, setMenuState] = useState(false);
@@ -79,12 +85,21 @@ export const HeroHeader = () => {
               <ul className="hidden lg:flex items-center gap-1">
                 {menuItems.map((item, index) => (
                   <li key={index}>
-                    <a
-                      href={item.href}
-                      className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:text-primary hover:bg-primary/5"
-                    >
-                      {item.name}
-                    </a>
+                    {item.name === 'Pricing' ? (
+                      <RegisterLink
+                        className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:text-primary hover:bg-primary/5"
+                        authUrlParams={registerAuthUrlParams}
+                      >
+                        {item.name}
+                      </RegisterLink>
+                    ) : (
+                      <a
+                        href={item.href}
+                        className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-muted-foreground transition-all hover:text-primary hover:bg-primary/5"
+                      >
+                        {item.name}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -139,6 +154,7 @@ export const HeroHeader = () => {
                         style={{
                           clipPath: 'polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%)',
                         }}
+                        authUrlParams={registerAuthUrlParams}
                       >
                         Initialize <Zap className="ml-1 size-3 fill-current" />
                       </RegisterLink>
@@ -172,21 +188,35 @@ export const HeroHeader = () => {
           <ul className="space-y-4">
             {menuItems.map((item, index) => (
               <li key={index}>
-                <a
-                  href={item.href}
-                  onClick={() => setMenuState(false)}
-                  className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:text-primary"
-                >
-                  <Cpu className="size-4 text-primary" />
-                  {item.name}
-                </a>
+                {item.name === 'Pricing' ? (
+                  <RegisterLink
+                    onClick={() => setMenuState(false)}
+                    className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:text-primary"
+                    authUrlParams={registerAuthUrlParams}
+                  >
+                    <Cpu className="size-4 text-primary" />
+                    {item.name}
+                  </RegisterLink>
+                ) : (
+                  <a
+                    href={item.href}
+                    onClick={() => setMenuState(false)}
+                    className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest hover:text-primary"
+                  >
+                    <Cpu className="size-4 text-primary" />
+                    {item.name}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
           <div className="mt-6 flex flex-col gap-3 border-t border-border pt-6">
             <ThemeToggle />
             {!user && (
-              <RegisterLink className={cn(buttonVariants(), 'w-full rounded-none')}>
+              <RegisterLink
+                className={cn(buttonVariants(), 'w-full rounded-none')}
+                authUrlParams={registerAuthUrlParams}
+              >
                 Sign Up Now
               </RegisterLink>
             )}
