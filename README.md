@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## ⚡ Key Highlights
 
-## Getting Started
+* **Real-time Engine:** Powered by **Cloudflare Durable Objects** (Partyserver) for sub-100ms latency.
+* **AI-First UX:** Integrated **OpenRouter & Vercel AI SDK** for smart message composing and thread summarization.
+* **Enterprise Auth:** Multi-tenant architecture using **Kinde Organizations**.
+* **Security:** Layered protection with **Arcjet WAF**, Bot detection, and PII scanning.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🏗 Architecture & Tech Stack
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Core Framework
+* **Next.js 15 (App Router)** & **React 19** (Server Components, Actions).
+* **TypeScript** for end-to-end type safety.
+* **oRPC & Zod:** Type-safe API layer for seamless Client-Server communication.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Data & Real-time
+* **Database:** PostgreSQL via **Prisma ORM**.
+* **Real-time & Presence:** **Partyserver** + Cloudflare Durable Objects for scalable WebSockets.
+* **State Management:** **TanStack Query v5** for optimistic UI updates and cache synchronization.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### UI & UX
+* **Editor:** **TipTap** Rich Text Editor with custom extensions and HTML sanitization.
+* **Styling:** **Tailwind CSS v4** & **Radix UI** primitives.
+* **Media:** High-speed image uploads via **Uploadthing**.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠 Technical Deep Dive: Challenges & Solutions
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 1. Synchronizing Real-time State with TanStack Query
+* **Challenge:** Keeping the UI consistent across multiple tabs when a new message or reaction arrives via WebSockets.
+* **Solution:** Implemented a custom `RealtimeProvider` that intercepts Partyserver events to manually update the TanStack Query cache. This enables **Optimistic Updates**, making the UI feel instantaneous.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 2. Multi-tenant Routing & Security
+* **Challenge:** Ensuring data isolation and dynamic routing based on Kinde Organizations.
+* **Solution:** Built a middleware-level redirect system that validates session tokens against `org_code`, ensuring users can only access their authorized `/workspace/[workspaceId]` context.
 
-## Deploy on Vercel
+### 3. Edge-ready AI Streaming
+* **Challenge:** Long-running AI tasks (like summarizing a 50-message thread) blocking the UI.
+* **Solution:** Utilized **Vercel AI SDK's `streamText`** combined with OpenRouter. The summary is streamed directly to the Sidebar, allowing users to continue chatting while the AI works.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛡 Security & Resilience
+* **Arcjet Integration:** Implemented specialized rules for rate limiting (shielding expensive AI routes) and bot protection.
+* **Data Integrity:** Zod schemas shared between client and server to prevent malformed data injection.
+* **XSS Protection:** Strict HTML sanitization on all Rich Text content before rendering.
