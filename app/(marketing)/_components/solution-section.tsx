@@ -2,6 +2,8 @@
 
 import { Zap, Bot, Shield, ArrowRight, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LoginLink } from '@kinde-oss/kinde-auth-nextjs';
+import { buttonVariants } from '@/components/ui/button';
 
 const steps = [
   {
@@ -70,13 +72,20 @@ export function SolutionSection() {
               ))}
             </div>
 
-            <button className="group flex items-center gap-3 text-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors">
-              Explore all features
-              <ArrowRight
-                size={18}
-                className="text-primary transition-transform group-hover:translate-x-2"
-              />
-            </button>
+            <div className="flex items-center justify-center">
+              <LoginLink
+                className={cn(
+                  buttonVariants({ variant: 'ghost', size: 'sm' }),
+                  'group inline-flex items-center gap-3 text-foreground font-bold text-sm uppercase tracking-widest hover:text-primary transition-colors',
+                )}
+              >
+                Explore all features
+                <ArrowRight
+                  size={18}
+                  className="text-primary transition-transform group-hover:translate-x-2"
+                />
+              </LoginLink>
+            </div>
           </div>
 
           <div className="relative">
