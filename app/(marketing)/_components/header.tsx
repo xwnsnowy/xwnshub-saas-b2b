@@ -116,9 +116,11 @@ export const HeroHeader = () => {
 
             {/* ACTION SECTION */}
             <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden xs:block">
+              <div className="hidden sm:block">
                 <ThemeToggle />
               </div>
+
+              <div className="hidden sm:block h-6 w-[1px] bg-border/50" />
 
               {!isLoading && (
                 <div className="flex items-center gap-2">
